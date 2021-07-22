@@ -1,4 +1,4 @@
-import {  filterData, sortData, compute } from './data.js';
+import {  filterData, sortData, greaterHeight, greaterWeight } from './data.js';
 
 import data from './data/pokemon/pokemon.js';
 
@@ -9,7 +9,7 @@ const containerPokemon = document.getElementById("containerPokemon");
 const filterList = document.getElementById('filterList');
 const sortList = document.getElementById('sortList');
 
-//Esta función crea y MUESTRA los pokémon cards
+//Esta función crea y muestra los pokémon cards
 function loadedData(){
     for(let i=0; i< originalData.length; i++){
         containerPokemon.innerHTML += `
@@ -62,14 +62,6 @@ const selectTypePokemon = (typeSelected) => {
     })
 }
 
-
-//evento seleccionar opciones de tipo (FILTRO) - resumida 09/07
-/*document.getElementById('filterList').addEventListener('change', (event) => {
-    document.getElementById('containerPokemon').innerHTML = ` `;
-    document.getElementById('sortList').selectedIndex = 0;
-    selectTypePokemon(event.target.value);
-    prueba();*/
-
 //Este evento selecciona un value de 'filterList', luego invoca la función para MOSTRAR los pokémon cards
 filterList.addEventListener('change', (e) => {
     sortList.selectedIndex = 0;
@@ -86,7 +78,7 @@ document.getElementById("sortList").addEventListener("change", (event) => {
     filterList.selectedIndex = 0;
 
     if (event.target.value === "A-Z" || event.target.value === "Z-A" ) {
-        const sortArray = sortData(data.pokemon, "name", event.target.value); //appendChild
+        const sortArray = sortData(data.pokemon, "name", event.target.value); 
         
         for (let i = 0; i < data.pokemon.length; i++) {
 
@@ -103,8 +95,6 @@ document.getElementById("sortList").addEventListener("change", (event) => {
     if (event.target.value === "sortNumerically"){
         const sortArrayNum = sortData(data.pokemon, "num", event.target.value);
         for(let i=0; i<data.pokemon.length; i++) {
-
-            //appendChild
             document.getElementById("containerPokemon").innerHTML += ` 
             <div id="${sortArrayNum[i].num}" class="single-card">
             <h3 class="num-card">Nº ${sortArrayNum[i].num}</h3>
@@ -148,7 +138,6 @@ document.getElementById("sortList").addEventListener("change", (event) => {
 const openModal = () => {
     document.querySelectorAll(".single-card").forEach(card => card.addEventListener('click', (e)=>{
         e.stopPropagation();
-        //console.log(e.currentTarget.id);
         createModal(e.currentTarget.id)
     })
     );
@@ -170,11 +159,11 @@ const callCompute = () => {
     document.querySelector('.video-youtube').removeAttribute('src');
     document.getElementById('newContainer').style.visibility = 'hidden';
     document.getElementById('searchAreaContainer').style.display = 'none';
-    filterList.selectedIndex = 0;
-    sortList.selectedIndex = 0;
+/*     filterList.selectedIndex = 0;
+    sortList.selectedIndex = 0; */
     containerPokemon.innerHTML = ` `;
     containerPokemon.innerHTML = `<h3 style='width: 100%; text-align: center; margin: 20px 0;'>Cool! Buddy, here you have the 10 highest pokemon in the region Kanto and Johto Regions! 📏</h3>`;
-    return compute([...originalData], 10).map((elemento)=>{
+    return greaterHeight(originalData, 10).map((elemento)=>{
         containerPokemon.innerHTML += `
             <div id=${elemento['num']} class="single-card">
                 <h3 class="num-card">Nº ${elemento['num']}</h3>
@@ -187,10 +176,33 @@ const callCompute = () => {
 }
 document.getElementById('topTenHeight').addEventListener('click', callCompute)
 
+// Top 10 pokemones más pesados
+const computeState= () =>{
+    containerPokemon.innerHTML = "";
+    document.getElementById("searchAreaContainer").style.display="none";
+    containerPokemon.innerHTML= ` <h3 style='width: 100%; text-align: center; margin: 20px 0;'>Cool! Buddy, here you have the 10 heaviest pokemon in the region Kanto and Johto Regions! 📏</h3>`;
+    return greaterWeight([...data.pokemon], 10).map(pokemonPesado=>{
+    containerPokemon.innerHTML += `
+                <div id=${pokemonPesado['num']} class="single-card">
+                <h3 class="num-card">Nº ${pokemonPesado['num']}</h3>
+                <span class="tooltip">Click to see information</span>
+                <img class="img-card" id="img-card" src="https://www.serebii.net/pokemongo/pokemon/${pokemonPesado['num']}.png"></img>
+                <div class="name-card"> ${pokemonPesado['name']} </div>
+            </div>
+    `
+    openModal();
+});
+}
+ document.getElementById('topTenWeight').addEventListener('click', computeState);
+
+
+
+
+
 //mostrando sección de How to be a pokemon master
 document.getElementById('howToBePokemonMaster').addEventListener('click', ()=>{
     document.querySelector('.video-youtube').setAttribute('src', 'https://www.youtube.com/embed/Jgh3ZgX6-vQ');
     document.getElementById('searchAreaContainer').style.display = 'none';
     containerPokemon.innerHTML = ` `;
     document.getElementById('newContainer').style.visibility = 'visible';
-})
+});
